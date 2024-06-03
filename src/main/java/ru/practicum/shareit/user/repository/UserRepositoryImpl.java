@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class UserRepositoryImpl implements UserRepository {
     private final Map<Integer, User> users = new HashMap<>();
     private int nextId = 1;
+
     private int generateId() {
         return nextId++;
     }
@@ -29,7 +30,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         user.setId(generateId());
         int id = user.getId();
-        users.put(id , user);
+        users.put(id, user);
         return users.get(id);
     }
 

@@ -17,10 +17,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class CreateItemRequest {
     @NotEmpty(message = "name is not be empty")
-    private  String name;
+    private String name;
 
     @NotEmpty(message = "description is not be empty")
     private String description;
 
     @NotNull(message = "available is not be null")
-    private Boolean available;}
+    private Boolean available;
+}
