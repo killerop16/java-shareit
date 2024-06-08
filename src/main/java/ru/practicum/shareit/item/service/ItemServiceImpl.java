@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -13,10 +13,10 @@ import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private ModelMapper mapper;
-    private ItemRepositoryImpl repository;
+    private final ModelMapper mapper;
+    private final ItemRepositoryImpl repository;
 
     @Override
     public Item createItem(int userId, CreateItemRequest itemDto) {

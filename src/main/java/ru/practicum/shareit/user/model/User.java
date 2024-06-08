@@ -6,9 +6,6 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 public class User {
     private int id;
