@@ -8,6 +8,8 @@ import ru.practicum.shareit.exception.modelException.DuplicateEmailException;
 import ru.practicum.shareit.exception.modelException.NotFoundException;
 import ru.practicum.shareit.exception.modelException.ValidationException;
 
+import javax.persistence.EntityNotFoundException;
+
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -17,9 +19,9 @@ public class ErrorHandler {
         return new ErrorResponse(exception.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({NotFoundException.class, EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFound(final NotFoundException exception) {
+    public ErrorResponse handleNotFound(Exception exception) {
         return new ErrorResponse(exception.getMessage());
     }
 
@@ -28,4 +30,10 @@ public class ErrorHandler {
     public ErrorResponse handleDuplicateEmail(final DuplicateEmailException exception) {
         return new ErrorResponse(exception.getMessage());
     }
+
+//    @ExceptionHandler
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ErrorResponse handleDuplicateEmail(final Exception exception) {
+//        return new ErrorResponse(exception.getMessage());
+//    }
 }

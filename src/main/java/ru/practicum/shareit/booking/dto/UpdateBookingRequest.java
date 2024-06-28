@@ -1,16 +1,14 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.booking.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.stereotype.Component;
 
 @Component
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserRequest {
-    private String name;
-    private String email;
+public class UpdateBookingRequest {
+    private Boolean approved;
 }
