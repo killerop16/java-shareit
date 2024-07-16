@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS items (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(1000),
     is_available BOOLEAN DEFAULT FALSE
---    request_id INT REFERENCES requests(id)
    );
 
 CREATE TABLE IF NOT EXISTS comments (
