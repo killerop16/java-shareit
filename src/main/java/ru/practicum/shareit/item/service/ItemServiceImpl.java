@@ -6,7 +6,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingResponseDepends;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.modelException.NotFoundException;
@@ -25,9 +24,10 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -83,10 +83,38 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse findItemById(int itemId, int userId) {
         log.info("find item by id '{}'", itemId);
-        Optional<Item> item = itemRepository.findById(itemId);
-        Item foundItem = item.orElseThrow(() -> new NotFoundException("No User with such id"));
+        Item foundItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("No Item with such id"));
 
-        return toItemResponse(foundItem, userId);
+        List<Item> items = Collections.singletonList(foundItem); // Оборачиваем в список
+
+        Map<Integer, List<CommentResponse>> commentsMap = commentRepository.findAllByItems(items).stream()
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId(),
+                        Collectors.mapping(comment -> new CommentResponse(comment.getId(), comment.getText(),
+                                        comment.getAuthor().getName(), comment.getCreated()),
+                                Collectors.toList())));
+
+        Map<Integer, BookingResponseDepends> lastBookingsMap = bookingRepository.findAllLastBookingsByItemsAndStatus(
+                        Collections.singletonList(itemId),
+                        Status.APPROVED, LocalDateTime.now()).stream()
+                .collect(Collectors.toMap(
+                        booking -> booking.getItem().getId(),
+                        booking -> mapper.map(booking, BookingResponseDepends.class),
+                        (existing, replacement) -> replacement // Обновляем значение
+                ));
+
+        Map<Integer, BookingResponseDepends> nextBookingsMap = bookingRepository.findAllNextBookingsByItemsAndStatus(
+                        Collections.singletonList(itemId),
+                        Status.APPROVED, LocalDateTime.now()).stream()
+                .collect(Collectors.toMap(
+                        booking -> booking.getItem().getId(),
+                        booking -> mapper.map(booking, BookingResponseDepends.class),
+                        (existing, replacement) -> replacement // Обновляем значение
+                ));
+
+
+        return toItemResponse(foundItem, userId, commentsMap, lastBookingsMap, nextBookingsMap);
+
     }
 
     @Override
@@ -94,16 +122,62 @@ public class ItemServiceImpl implements ItemService {
         log.info("find user items by id '{}'", userId);
         User user = checkUserExist(userId);
 
-        return itemRepository.findItemsByIdOwnerOrderById(user).stream()
-                .map(item -> toItemResponse(item, userId))
+        List<Item> items = itemRepository.findItemsByIdOwnerOrderById(user);
+        Map<Integer, List<CommentResponse>> commentsMap = commentRepository.findAllByItems(items).stream()
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId(),
+                        Collectors.mapping(comment -> new CommentResponse(comment.getId(), comment.getText(),
+                                        comment.getAuthor().getName(), comment.getCreated()),
+                                Collectors.toList())));
+
+        // Получение последних бронирований с обновлением значений при дубликатах
+        Map<Integer, BookingResponseDepends> lastBookingsMap = bookingRepository.findAllLastBookingsByItemsAndStatus(
+                        items.stream().map(Item::getId).collect(Collectors.toList()),
+                        Status.APPROVED, LocalDateTime.now()).stream()
+                .collect(Collectors.toMap(
+                        booking -> booking.getItem().getId(),
+                        booking -> mapper.map(booking, BookingResponseDepends.class),
+                        (existing, replacement) -> replacement // Обновляем значение при дубликатах
+                ));
+
+        // Получение следующих бронирований с обновлением значений при дубликатах
+        Map<Integer, BookingResponseDepends> nextBookingsMap = bookingRepository.findAllNextBookingsByItemsAndStatus(
+                        items.stream().map(Item::getId).collect(Collectors.toList()),
+                        Status.APPROVED, LocalDateTime.now()).stream()
+                .collect(Collectors.toMap(
+                        booking -> booking.getItem().getId(),
+                        booking -> mapper.map(booking, BookingResponseDepends.class),
+                        (existing, replacement) -> replacement)); // Обновляем значение при дубликатах
+
+        return items.stream()
+                .map(item -> toItemResponse(item, userId, commentsMap, lastBookingsMap, nextBookingsMap))
                 .collect(toList());
     }
 
+    /**
+     * Метод собирает ItemDto для ответа добавляет букинги и коменты
+     */
+    private ItemResponse toItemResponse(Item item, int userId,
+                                        Map<Integer, List<CommentResponse>> commentsMap,
+                                        Map<Integer, BookingResponseDepends> lastBookingsMap,
+                                        Map<Integer, BookingResponseDepends> nextBookingsMap) {
+
+        ItemResponse itemResponse = mapper.map(item, ItemResponse.class);
+
+        if (item.getIdOwner().getId() == userId) {
+            itemResponse.setLastBooking(lastBookingsMap.getOrDefault(itemResponse.getId(), null));
+            itemResponse.setNextBooking(nextBookingsMap.getOrDefault(itemResponse.getId(), null));
+        }
+
+        List<CommentResponse> comments = commentsMap.getOrDefault(item.getId(), Collections.emptyList());
+        itemResponse.setComments(comments);
+
+        return itemResponse;
+    }
 
     @Override
     public List<ItemResponse> findItemByText(int userId, String text) {
-        if (text.isEmpty()) {
-            return new ArrayList<>();
+        if (text.isBlank()) {
+            return List.of();
         }
         checkUserExist(userId);
 
@@ -152,37 +226,4 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
     }
 
-    /**
-     * Метод собирает ItemDto для ответа добавляет букинги и коменты
-     */
-    private ItemResponse toItemResponse(Item item, int userId) {
-        ItemResponse itemResponse = mapper.map(item, ItemResponse.class);
-
-        if (item.getIdOwner().getId() == userId) {
-            Optional<Booking> last = bookingRepository.findFirstByItemIdAndStatusAndStartBeforeOrderByEndDesc(itemResponse.getId(),
-                    Status.APPROVED, LocalDateTime.now());
-            if (last.isPresent()) {
-                BookingResponseDepends lastBooking = mapper.map(last.get(), BookingResponseDepends.class);
-                itemResponse.setLastBooking(lastBooking);
-            } else itemResponse.setLastBooking(null);
-
-
-            Optional<Booking> next = bookingRepository.findFirstByItemIdAndStatusAndStartAfterOrderByStart(itemResponse.getId(),
-                    Status.APPROVED, LocalDateTime.now());
-            if (next.isPresent()) {
-                BookingResponseDepends nextBooking = mapper.map(next, BookingResponseDepends.class);
-                itemResponse.setNextBooking(nextBooking);
-            } else itemResponse.setNextBooking(null);
-        }
-
-        List<CommentResponse> comments = commentRepository.findAllByItem(item).stream()
-                .map(comment -> new CommentResponse(comment.getId(), comment.getText(),
-                        comment.getAuthor().getName(), comment.getCreated()))
-                .collect(toList());
-
-
-        itemResponse.setComments(comments);
-
-        return itemResponse;
-    }
 }

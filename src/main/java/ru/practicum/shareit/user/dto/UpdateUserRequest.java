@@ -1,13 +1,19 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
+import javax.validation.constraints.Size;
+
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UpdateUserRequest {
+    @Size(max = 255)
     private String name;
+    @Size(max = 512)
     private String email;
 }

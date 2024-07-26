@@ -45,13 +45,13 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingResponse> findUserReservationItems(@RequestHeader(HttpHeaders.USER_ID) int userId,
-                                                  @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                                  @RequestParam(defaultValue = "ALL") String state) {
         return bookingService.findUserReservationItems(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingResponse> findOwnerReservationItems(@RequestHeader(HttpHeaders.USER_ID) int userId,
-                                                   @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                                   @RequestParam(defaultValue = "ALL") String state) {
         return bookingService.findOwnerReservationItems(userId, state);
     }
 

@@ -1,7 +1,10 @@
 package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.user.model.User;
@@ -42,4 +45,17 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     List<Booking> findAllByBookerIdAndItemIdAndEndBeforeAndStatus(int bookerId, int itemId,
                                                                   LocalDateTime end, Status status);
+
+    @EntityGraph(attributePaths = {"item", "booker"})
+    @Query("SELECT b FROM Booking b WHERE b.item.id IN :itemIds AND b.status = :status AND b.start < :currentDate")
+    List<Booking> findAllLastBookingsByItemsAndStatus(@Param("itemIds") List<Integer> itemIds,
+                                                      @Param("status") Status status,
+                                                      @Param("currentDate") LocalDateTime currentDate);
+
+
+    @EntityGraph(attributePaths = {"item", "booker"})
+    @Query("SELECT b FROM Booking b WHERE b.item.id IN :itemIds AND b.status = :status AND b.start > :currentDate")
+    List<Booking> findAllNextBookingsByItemsAndStatus(@Param("itemIds") List<Integer> itemIds,
+                                                      @Param("status") Status status,
+                                                      @Param("currentDate") LocalDateTime currentDate);
 }

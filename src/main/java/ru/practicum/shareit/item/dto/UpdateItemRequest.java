@@ -1,29 +1,23 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UpdateItemRequest {
-    @Positive(message = "ID должен быть положительным числом")
     private int id;
 
-    @Positive(message = "ID пользователя должен быть положительным числом")
-    private  int idOwner;
+    @Size(max = 255)
+    private String name;
 
-    @NotEmpty(message = "name is not be empty")
-    private  String name;
-
-    @NotEmpty(message = "description is not be empty")
+    @Size(max = 1000)
     private String description;
-
-    @NotNull(message = "available is not be null")
     private Boolean available;
 }

@@ -1,21 +1,23 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingResponseDepends;
 import ru.practicum.shareit.item.comment.dto.CommentResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemResponse {
     private int id;
-    private  int idOwner;
-    private  String name;
+    private int idOwner;
+    private String name;
     private String description;
     private Boolean available;
 
