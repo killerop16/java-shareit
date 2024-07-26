@@ -1,19 +1,35 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.Setter;
+import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.item.dto.ItemResponseDepends;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dto.UserResponseDepends;
+import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.NotNull;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.time.LocalDateTime;
 
-@Component
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class BookingResponse {
-    @NotNull
-    private Long id;
-    @NotNull
-    private Long bookerId;
+    private int id;
+    private LocalDateTime start;
+    private LocalDateTime end;
+    private Status status;
+
+    private ItemResponseDepends item;
+    private UserResponseDepends booker;
 }

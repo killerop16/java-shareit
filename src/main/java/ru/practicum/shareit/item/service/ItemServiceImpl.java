@@ -3,8 +3,9 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.dto.BookingResponse;
+import ru.practicum.shareit.booking.dto.BookingResponseDepends;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.item.dto.ItemResponse;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
@@ -26,7 +28,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Slf4j
@@ -39,29 +43,32 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public Item createItem(int userId, CreateItemRequest itemDto) {
-        checkUserExist(userId);
+    public ItemResponse createItem(int userId, CreateItemRequest itemDto) {
+        User user = checkUserExist(userId);
 
         log.info("user '{}' create item", userId);
         Item item = mapper.map(itemDto, Item.class);
-        item.setIdOwner(userId);
+        item.setIdOwner(user);
         item = itemRepository.save(item);
-        return item;
+        return mapper.map(item, ItemResponse.class);
     }
 
     @Override
-    public Item updateItem(int userId, int itemId, UpdateItemRequest itemDto) {
-        Item item = itemRepository.findItemByIdAndIdOwner(itemId, userId)
-                .orElseThrow(() -> new NotFoundException("Item not found with id " + itemId
-                        + "' for user with id: " + userId));
+    public ItemResponse updateItem(int userId, int itemId, UpdateItemRequest itemDto) {
+        User user = checkUserExist(userId);
 
-        item.setIdOwner(userId);
+        log.info("Find item with id " + itemId + " for user with id: " + userId);
+        Item item = checkItemExist(itemId);
 
-        if (itemDto.getName() != null) {
+        item.setIdOwner(user);
+
+        String name = itemDto.getName();
+        if (name != null && !name.isBlank()) {
             item.setName(itemDto.getName());
         }
 
-        if (itemDto.getDescription() != null) {
+        String description = itemDto.getDescription();
+        if (description != null && !description.isBlank()) {
             item.setDescription(itemDto.getDescription());
         }
 
@@ -70,7 +77,8 @@ public class ItemServiceImpl implements ItemService {
         }
 
         log.info("Updating item with id '{}' for user with id '{}'", itemId, userId);
-        return itemRepository.save(item);
+        item = itemRepository.save(item);
+        return mapper.map(item, ItemResponse.class);
     }
 
     @Override
@@ -85,64 +93,31 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemResponse> findUserItemsById(int userId) {
         log.info("find user items by id '{}'", userId);
+        User user = checkUserExist(userId);
 
-        return itemRepository.findItemsByIdOwnerOrderById(userId).stream()
+        return itemRepository.findItemsByIdOwnerOrderById(user).stream()
                 .map(item -> toItemResponse(item, userId))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * метод собирает ItemDto для ответа добавляет букинги и коментарии
-     */
-    private ItemResponse toItemResponse(Item item, int userId) {
-
-        ItemResponse itemResponse = mapper.map(item, ItemResponse.class);
-        if (item.getIdOwner() == userId) {
-            Optional<Booking> last = bookingRepository.findFirstByItemIdAndStatusAndStartBeforeOrderByEndDesc(itemResponse.getId(),
-                    Status.APPROVED, LocalDateTime.now());
-            if (last.isPresent()) {
-                BookingResponse lastBooking = mapper.map(last.get(), BookingResponse.class);
-                itemResponse.setLastBooking(lastBooking);
-            } else itemResponse.setLastBooking(null);
-
-
-            Optional<Booking> next = bookingRepository.findFirstByItemIdAndStatusAndStartAfterOrderByStart(itemResponse.getId(),
-                    Status.APPROVED, LocalDateTime.now());
-            if (next.isPresent()) {
-                BookingResponse nextBooking = mapper.map(next, BookingResponse.class);
-                itemResponse.setNextBooking(nextBooking);
-            } else itemResponse.setNextBooking(null);
-        }
-
-        List<CommentResponse> comments = commentRepository.findAllByItem(item).stream()
-                .map(comment -> new CommentResponse(comment.getId(), comment.getText(),
-                        comment.getAuthor().getName(), comment.getCreated()))
-                .collect(Collectors.toList());
-
-
-        itemResponse.setComments(comments);
-
-        return itemResponse;
+                .collect(toList());
     }
 
 
     @Override
-    public List<Item> findItemByText(int userId, String text) {
+    public List<ItemResponse> findItemByText(int userId, String text) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        checkUserExist(userId);
+       checkUserExist(userId);
 
         log.info("find item by text {}", text);
-        return itemRepository.search(text);
+        List<Item> items = itemRepository.search(text);
+        return mapper.map(items, new TypeToken<List<ItemResponse>>() {
+        }.getType());
     }
 
     @Override
     public CommentResponse createComment(int userId, int itemId, CreateCommentRequest commentDto) {
-        var item = itemRepository.findById(itemId).orElseThrow(()
-                -> new ValidationException("Item not found"));
-        var user = userRepository.findById(userId).orElseThrow(()
-                -> new ValidationException("User not found"));
+        var item = checkItemExist(itemId);
+        var user = checkUserExist(userId);
 
         var bookings = bookingRepository.findAllByBookerIdAndItemIdAndEndBeforeAndStatus(userId,
                 itemId, LocalDateTime.now(), Status.APPROVED);
@@ -161,8 +136,54 @@ public class ItemServiceImpl implements ItemService {
                 comment.getAuthor().getName(), comment.getCreated());
     }
 
-    private void checkUserExist(int userId) {
-        userRepository.findById(userId)
+    /**
+     * Метод проверяет наличие item и возвращает в случаи если он есть
+     */
+    private Item checkItemExist(int itemId){
+        return itemRepository.findById(itemId).orElseThrow(()
+                -> new ValidationException("Item not found"));
+    }
+
+
+    /**
+     * Метод проверяет наличие user и возвращает в случаи если он есть
+     */
+    private User checkUserExist(int userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+    }
+
+    /**
+     * Метод собирает ItemDto для ответа добавляет букинги и коменты
+     */
+    private ItemResponse toItemResponse(Item item, int userId) {
+        ItemResponse itemResponse = mapper.map(item, ItemResponse.class);
+
+        if (item.getIdOwner().getId() == userId) {
+            Optional<Booking> last = bookingRepository.findFirstByItemIdAndStatusAndStartBeforeOrderByEndDesc(itemResponse.getId(),
+                    Status.APPROVED, LocalDateTime.now());
+            if (last.isPresent()) {
+                BookingResponseDepends lastBooking = mapper.map(last.get(), BookingResponseDepends.class);
+                itemResponse.setLastBooking(lastBooking);
+            } else itemResponse.setLastBooking(null);
+
+
+            Optional<Booking> next = bookingRepository.findFirstByItemIdAndStatusAndStartAfterOrderByStart(itemResponse.getId(),
+                    Status.APPROVED, LocalDateTime.now());
+            if (next.isPresent()) {
+                BookingResponseDepends nextBooking = mapper.map(next, BookingResponseDepends.class);
+                itemResponse.setNextBooking(nextBooking);
+            } else itemResponse.setNextBooking(null);
+        }
+
+        List<CommentResponse> comments = commentRepository.findAllByItem(item).stream()
+                .map(comment -> new CommentResponse(comment.getId(), comment.getText(),
+                        comment.getAuthor().getName(), comment.getCreated()))
+                .collect(toList());
+
+
+        itemResponse.setComments(comments);
+
+        return itemResponse;
     }
 }

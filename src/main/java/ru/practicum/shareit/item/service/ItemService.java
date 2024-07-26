@@ -10,15 +10,15 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 public interface ItemService {
-    Item createItem(int userId, CreateItemRequest itemDto);
+    ItemResponse createItem(int userId, CreateItemRequest itemDto);
 
-    Item updateItem(int userId, int itemId, UpdateItemRequest itemDto);
+    ItemResponse updateItem(int userId, int itemId, UpdateItemRequest itemDto);
 
     ItemResponse findItemById(int itemId, int userId);
 
     List<ItemResponse> findUserItemsById(int userId);
 
-    List<Item> findItemByText(int userId, String text);
+    List<ItemResponse> findItemByText(int userId, String text);
 
     CommentResponse createComment(int userId, int itemId, CreateCommentRequest commentDto);
 }

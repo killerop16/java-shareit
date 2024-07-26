@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Component
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

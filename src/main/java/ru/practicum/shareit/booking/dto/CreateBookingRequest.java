@@ -4,18 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.exception.modelException.validDate.StartBeforeEndDateValid;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Component
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@StartBeforeEndDateValid
 public class CreateBookingRequest {
-    @NotNull
+    @FutureOrPresent
     private LocalDateTime start;
-    @NotNull
+    @Future
     private LocalDateTime end;
     @NotNull
     private Integer itemId;

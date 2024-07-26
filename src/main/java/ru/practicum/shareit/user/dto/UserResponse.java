@@ -1,13 +1,16 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
-@Data
-@AllArgsConstructor
+import lombok.Setter;
+
+@Getter
+@Setter
 @NoArgsConstructor
-public class UpdateUserRequest {
+@AllArgsConstructor
+public class UserResponse {
+    private int id;
     private String name;
     private String email;
 }

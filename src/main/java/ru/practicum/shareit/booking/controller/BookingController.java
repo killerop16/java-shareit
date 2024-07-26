@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.util.HttpHeaders;
+import ru.practicum.shareit.booking.dto.BookingResponse;
 import ru.practicum.shareit.booking.dto.CreateBookingRequest;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
@@ -24,32 +25,32 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public Booking createBooking(@Valid @RequestBody CreateBookingRequest bookingDto,
-                                 @RequestHeader("X-Sharer-User-Id") int userId) {
+    public BookingResponse createBooking(@Valid @RequestBody CreateBookingRequest bookingDto,
+                                         @RequestHeader(HttpHeaders.USER_ID) int userId) {
         return bookingService.createBooking(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
-    public Booking confirmOrRejectBooking(@PathVariable int bookingId,
+    public BookingResponse confirmOrRejectBooking(@PathVariable int bookingId,
                                           @RequestParam boolean approved,
-                                          @RequestHeader("X-Sharer-User-Id") int userId) {
+                                          @RequestHeader(HttpHeaders.USER_ID) int userId) {
         return bookingService.confirmOrRejectBooking(bookingId, approved, userId);
     }
 
     @GetMapping("/{bookingId}")
-    public Booking findBookingById(@RequestHeader("X-Sharer-User-Id") int userId,
+    public BookingResponse findBookingById(@RequestHeader(HttpHeaders.USER_ID) int userId,
                                     @PathVariable int bookingId) {
         return bookingService.findBookingById(userId, bookingId);
     }
 
     @GetMapping()
-    public List<Booking> findUserReservationItems(@RequestHeader("X-Sharer-User-Id") int userId,
+    public List<BookingResponse> findUserReservationItems(@RequestHeader(HttpHeaders.USER_ID) int userId,
                                                   @RequestParam(required = false, defaultValue = "ALL") String state) {
         return bookingService.findUserReservationItems(userId, state);
     }
 
     @GetMapping("/owner")
-    public List<Booking> findOwnerReservationItems(@RequestHeader("X-Sharer-User-Id") int userId,
+    public List<BookingResponse> findOwnerReservationItems(@RequestHeader(HttpHeaders.USER_ID) int userId,
                                                    @RequestParam(required = false, defaultValue = "ALL") String state) {
         return bookingService.findOwnerReservationItems(userId, state);
     }
