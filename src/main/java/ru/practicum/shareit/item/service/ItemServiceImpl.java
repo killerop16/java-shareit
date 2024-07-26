@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -106,7 +105,7 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-       checkUserExist(userId);
+        checkUserExist(userId);
 
         log.info("find item by text {}", text);
         List<Item> items = itemRepository.search(text);
@@ -139,7 +138,7 @@ public class ItemServiceImpl implements ItemService {
     /**
      * Метод проверяет наличие item и возвращает в случаи если он есть
      */
-    private Item checkItemExist(int itemId){
+    private Item checkItemExist(int itemId) {
         return itemRepository.findById(itemId).orElseThrow(()
                 -> new ValidationException("Item not found"));
     }

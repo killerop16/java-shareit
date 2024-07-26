@@ -1,12 +1,9 @@
 package ru.practicum.shareit.exception.modelException.validDate;
 
 import ru.practicum.shareit.booking.dto.CreateBookingRequest;
-import ru.practicum.shareit.exception.modelException.ValidationException;
 
-import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.lang.annotation.Annotation;
 import java.time.LocalDateTime;
 
 public class CheckDateValidator implements ConstraintValidator<StartBeforeEndDateValid, CreateBookingRequest> {

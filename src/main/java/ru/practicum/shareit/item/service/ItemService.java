@@ -5,7 +5,6 @@ import ru.practicum.shareit.item.comment.dto.CreateCommentRequest;
 import ru.practicum.shareit.item.dto.CreateItemRequest;
 import ru.practicum.shareit.item.dto.ItemResponse;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
-import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 

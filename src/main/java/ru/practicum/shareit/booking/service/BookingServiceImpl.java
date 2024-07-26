@@ -168,7 +168,7 @@ public class BookingServiceImpl implements BookingService {
         userService.getById(userId);
     }
 
-    private User getUserById(int id){
+    private User getUserById(int id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }

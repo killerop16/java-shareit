@@ -1,7 +1,5 @@
 package ru.practicum.shareit.exception.modelException.validDate;
 
-import ru.practicum.shareit.exception.modelException.validDate.CheckDateValidator;
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.Documented;
