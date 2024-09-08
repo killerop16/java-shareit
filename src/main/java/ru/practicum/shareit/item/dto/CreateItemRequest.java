@@ -21,4 +21,6 @@ public class CreateItemRequest {
 
     @NotNull(message = "available is not be null")
     private Boolean available;
+
+    private Integer requestId;
 }

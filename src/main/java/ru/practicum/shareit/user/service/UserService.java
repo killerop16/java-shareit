@@ -16,5 +16,4 @@ public interface UserService {
     List<UserResponse> findAll();
 
     void delUserById(int id);
-
 }

@@ -2,21 +2,18 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotEmpty;
 
-@Component
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-public class ItemRequestDto {
-    private int id;
+@AllArgsConstructor
+public class CreateItemRequest {
+    @NotEmpty(message = "description is not be empty")
     private String description;
-    private User requestor;
-    private LocalDateTime created;
-
-
 }

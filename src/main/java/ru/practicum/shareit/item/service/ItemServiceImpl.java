@@ -46,8 +46,12 @@ public class ItemServiceImpl implements ItemService {
         User user = checkUserExist(userId);
 
         log.info("user '{}' create item", userId);
+
         Item item = mapper.map(itemDto, Item.class);
         item.setIdOwner(user);
+        if (item.getItemRequest().getId() != 0) {
+            item.setItemRequest(item.getItemRequest());
+        } else item.setItemRequest(null);
         item = itemRepository.save(item);
         return mapper.map(item, ItemResponse.class);
     }

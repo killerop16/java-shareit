@@ -23,7 +23,14 @@ public class ErrorHandler {
         return new ErrorResponse(exception.getMessage());
     }
 
-    @ExceptionHandler({NotFoundException.class, EntityNotFoundException.class})
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleNotFound(EntityNotFoundException exception) {
+        log.debug("Получен статус 403 FORBIDDEN {}", exception.getMessage(), exception);
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler({NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(Exception exception) {
         log.debug("Получен статус 404 NOT_FOUND {}", exception.getMessage(), exception);
