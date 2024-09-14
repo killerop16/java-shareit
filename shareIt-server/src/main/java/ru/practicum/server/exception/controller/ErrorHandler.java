@@ -10,7 +10,7 @@ import ru.practicum.server.exception.modelException.DuplicateEmailException;
 import ru.practicum.server.exception.modelException.NotFoundException;
 import ru.practicum.server.exception.modelException.ValidationException;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 
 
 @Slf4j

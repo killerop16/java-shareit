@@ -1,5 +1,6 @@
 package ru.practicum.gateway.exception.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +26,11 @@ public class ErrorHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exception.getMessage()));
     }
 
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> handleForbidden(EntityNotFoundException exception) {
-//        log.debug("Получен статус 403 FORBIDDEN {}", exception.getMessage(), exception);
-//        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(exception.getMessage()));
-//    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleForbidden(EntityNotFoundException exception) {
+        log.debug("Получен статус 403 FORBIDDEN {}", exception.getMessage(), exception);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(exception.getMessage()));
+    }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException exception) {
@@ -45,7 +46,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleHttpClientError(HttpClientErrorException exception) {
-        HttpStatus statusCode = exception.getStatusCode();
+        HttpStatus statusCode = (HttpStatus) exception.getStatusCode();
 
         log.debug("Получен статус {} от внешнего сервиса: {}", statusCode.value(), exception.getMessage(), exception);
 

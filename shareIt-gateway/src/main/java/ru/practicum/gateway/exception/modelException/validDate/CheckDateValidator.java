@@ -4,8 +4,8 @@ package ru.practicum.gateway.exception.modelException.validDate;
 
 import ru.practicum.gateway.booking.dto.CreateBookingRequest;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDateTime;
 
 public class CheckDateValidator implements ConstraintValidator<StartBeforeEndDateValid, CreateBookingRequest> {

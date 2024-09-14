@@ -22,7 +22,7 @@ import ru.practicum.server.item.repository.ItemRepository;
 import ru.practicum.server.user.model.User;
 import ru.practicum.server.user.repository.UserRepository;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +49,7 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = mapper.map(itemDto, Item.class);
         item.setIdOwner(user);
-        if (item.getItemRequest().getId() != 0) {
+        if (item.getItemRequest() != null) {
             item.setItemRequest(item.getItemRequest());
         } else item.setItemRequest(null);
         item = itemRepository.save(item);

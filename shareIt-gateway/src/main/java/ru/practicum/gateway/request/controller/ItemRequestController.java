@@ -19,7 +19,7 @@ import ru.practicum.gateway.request.dto.ItemRequestResponse;
 import ru.practicum.gateway.request.dto.ItemRequestResponseWithItems;
 import ru.practicum.gateway.util.HttpHeadersControllers;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController

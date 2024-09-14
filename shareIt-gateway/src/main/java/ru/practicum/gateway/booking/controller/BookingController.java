@@ -21,7 +21,7 @@ import ru.practicum.gateway.booking.dto.BookingResponse;
 import ru.practicum.gateway.booking.dto.CreateBookingRequest;
 import ru.practicum.gateway.util.HttpHeadersControllers;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 

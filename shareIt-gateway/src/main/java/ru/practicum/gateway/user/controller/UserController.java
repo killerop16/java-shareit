@@ -20,7 +20,7 @@ import ru.practicum.gateway.user.dto.CreateUserRequest;
 import ru.practicum.gateway.user.dto.UpdateUserRequest;
 import ru.practicum.gateway.user.dto.UserResponse;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController

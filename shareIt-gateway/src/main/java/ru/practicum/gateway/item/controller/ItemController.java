@@ -25,7 +25,7 @@ import ru.practicum.gateway.item.dto.ItemResponse;
 import ru.practicum.gateway.item.dto.UpdateItemRequest;
 import ru.practicum.gateway.util.HttpHeadersControllers;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
