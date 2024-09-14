@@ -6,7 +6,7 @@ import ru.practicum.server.booking.dto.CreateBookingRequest;
 import java.util.List;
 
 public interface BookingService {
-    BookingResponse createBooking(CreateBookingRequest bookingDto, int userId) ;
+    BookingResponse createBooking(CreateBookingRequest bookingDto, int userId);
 
     BookingResponse confirmOrRejectBooking(int bookingId, boolean approved, int userId);
 

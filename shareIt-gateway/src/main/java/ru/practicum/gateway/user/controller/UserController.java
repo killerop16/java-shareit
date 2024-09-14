@@ -3,7 +3,6 @@ package ru.practicum.gateway.user.controller;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +19,6 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.gateway.user.dto.CreateUserRequest;
 import ru.practicum.gateway.user.dto.UpdateUserRequest;
 import ru.practicum.gateway.user.dto.UserResponse;
-import ru.practicum.gateway.util.HttpHeadersControllers;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -60,6 +58,7 @@ public class UserController {
             throw new RuntimeException("Ошибка при обновлении пользователя: " + e.getMessage());
         }
     }
+
     @GetMapping("/{id}")
     public UserResponse getById(@PathVariable Integer id) {
         String serverUrl = "http://localhost:9090/users/{id}";
@@ -71,7 +70,8 @@ public class UserController {
     public List<UserResponse> findAll() {
         String serverUrl = "http://localhost:9090/users";
         ResponseEntity<List<UserResponse>> response = restTemplate.exchange(serverUrl, HttpMethod.GET, null,
-                new ParameterizedTypeReference<>() {});
+                new ParameterizedTypeReference<>() {
+                });
         return response.getBody();
     }
 
