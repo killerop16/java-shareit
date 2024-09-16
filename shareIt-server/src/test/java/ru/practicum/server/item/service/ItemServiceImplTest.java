@@ -8,37 +8,32 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import ru.practicum.server.booking.dto.BookingResponseDepends;
 import ru.practicum.server.booking.model.Status;
 import ru.practicum.server.booking.repository.BookingRepository;
-import ru.practicum.server.exception.modelException.NotFoundException;
 import ru.practicum.server.exception.modelException.ValidationException;
 import ru.practicum.server.item.comment.dto.CommentResponse;
 import ru.practicum.server.item.comment.dto.CreateCommentRequest;
-import ru.practicum.server.item.comment.model.Comment;
 import ru.practicum.server.item.comment.repository.CommentRepository;
 import ru.practicum.server.item.dto.CreateItemDto;
 import ru.practicum.server.item.dto.ItemResponse;
-import ru.practicum.server.item.dto.UpdateItemRequest;
 import ru.practicum.server.item.model.Item;
 import ru.practicum.server.item.repository.ItemRepository;
 import ru.practicum.server.user.model.User;
 import ru.practicum.server.user.repository.UserRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @Slf4j
 @RequiredArgsConstructor

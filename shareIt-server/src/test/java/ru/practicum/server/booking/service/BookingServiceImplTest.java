@@ -8,11 +8,9 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import ru.practicum.server.booking.dto.BookingResponse;
-import ru.practicum.server.booking.dto.CreateBookingRequest;
 import ru.practicum.server.booking.model.Booking;
 import ru.practicum.server.booking.model.Status;
 import ru.practicum.server.booking.repository.BookingRepository;
-import ru.practicum.server.item.dto.ItemResponse;
 import ru.practicum.server.item.model.Item;
 import ru.practicum.server.item.service.ItemService;
 import ru.practicum.server.user.dto.UserResponse;
@@ -23,8 +21,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class BookingServiceImplTest {
 
