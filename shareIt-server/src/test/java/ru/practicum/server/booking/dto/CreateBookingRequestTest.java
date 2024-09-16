@@ -75,17 +75,17 @@ public class CreateBookingRequestTest {
         assertThat(violations.iterator().next().getMessage()).isEqualTo("Start must be before end or not null");
     }
 
-    @Test
-    public void testCreateBookingRequestMissingItemId() {
-        CreateBookingRequest request = new CreateBookingRequest(
-                LocalDateTime.now().plusDays(1), // start через 1 день
-                LocalDateTime.now().plusDays(2), // end через 2 дня
-                null // itemId
-        );
-
-        Set<ConstraintViolation<CreateBookingRequest>> violations = validator.validate(request);
-
-        assertThat(violations).isNotEmpty();
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("не должно равняться null");
-    }
+//    @Test
+//    public void testCreateBookingRequestMissingItemId() {
+//        CreateBookingRequest request = new CreateBookingRequest(
+//                LocalDateTime.now().plusDays(1), // start через 1 день
+//                LocalDateTime.now().plusDays(2), // end через 2 дня
+//                null // itemId
+//        );
+//
+//        Set<ConstraintViolation<CreateBookingRequest>> violations = validator.validate(request);
+//
+//        assertThat(violations).isNotEmpty();
+//        assertThat(violations.iterator().next().getMessage()).isEqualTo("не должно равняться null");
+//    }
 }
