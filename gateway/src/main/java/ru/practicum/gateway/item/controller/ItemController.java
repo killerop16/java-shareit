@@ -118,7 +118,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentResponse createComment(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
-                                         @PathVariable int itemId, @Valid @RequestBody CreateCommentRequest commentDto) {
+                                         @PathVariable int itemId, @RequestBody CreateCommentRequest commentDto) {
 
         String serverUrl = String.format("http://localhost:9090/items/%d/comment", itemId);
 
