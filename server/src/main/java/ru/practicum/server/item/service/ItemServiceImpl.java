@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import ru.practicum.server.booking.dto.BookingResponseDepends;
+import ru.practicum.server.booking.model.Booking;
 import ru.practicum.server.booking.model.Status;
 import ru.practicum.server.booking.repository.BookingRepository;
 import ru.practicum.server.exception.modelException.NotFoundException;
@@ -193,10 +194,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentResponse createComment(int userId, int itemId, CreateCommentRequest commentDto) {
-        var item = checkItemExist(itemId);
-        var user = checkUserExist(userId);
+        Item item = checkItemExist(itemId);
+        User user = checkUserExist(userId);
 
-        var bookings = bookingRepository.findAllByBookerIdAndItemIdAndEndBeforeAndStatus(userId,
+        List<Booking> bookings = bookingRepository.findAllByBookerIdAndItemIdAndEndBeforeAndStatus(userId,
                 itemId, LocalDateTime.now(), Status.APPROVED);
         if (bookings.isEmpty()) {
             throw new ValidationException("This user did not rent this item");
