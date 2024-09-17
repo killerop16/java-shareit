@@ -35,7 +35,7 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingResponse createBooking(@Valid @RequestBody CreateBookingRequest bookingDto,
+    public BookingResponse createBooking(@RequestBody CreateBookingRequest bookingDto,
                                          @RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
         String serverUrl = "http://localhost:9090/bookings";
 
