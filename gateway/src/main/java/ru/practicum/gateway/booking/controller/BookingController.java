@@ -1,5 +1,6 @@
 package ru.practicum.gateway.booking.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -27,6 +28,9 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
+    @Value("${shareit.server.url}")
+    private String baseUrl;
+
     private final RestTemplate restTemplate;
 
     public BookingController(RestTemplateBuilder builder) {
@@ -36,13 +40,14 @@ public class BookingController {
     @PostMapping
     public BookingResponse createBooking(@RequestBody CreateBookingRequest bookingDto,
                                          @RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
-        String serverUrl = "http://localhost:9090/bookings";
+//        String serverUrl = "http://localhost:9090/bookings";
+        String path = baseUrl.concat("/bookings");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
         HttpEntity<CreateBookingRequest> request = new HttpEntity<>(bookingDto, headers);
 
-        ResponseEntity<BookingResponse> response = restTemplate.postForEntity(serverUrl, request, BookingResponse.class);
+        ResponseEntity<BookingResponse> response = restTemplate.postForEntity(path, request, BookingResponse.class);
         return response.getBody();
     }
 
@@ -50,7 +55,8 @@ public class BookingController {
     public BookingResponse confirmOrRejectBooking(@PathVariable int bookingId,
                                           @RequestParam boolean approved,
                                           @RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
-        String serverUrl = String.format("http://localhost:9090/bookings/%d?approved=%b", bookingId, approved);
+//        String serverUrl = String.format("http://localhost:9090/bookings/%d?approved=%b", bookingId, approved);
+        String path = baseUrl.concat(String.format("/bookings/%d?approved=%b", bookingId, approved));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
@@ -58,7 +64,7 @@ public class BookingController {
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
         ResponseEntity<BookingResponse> response = restTemplate.exchange(
-                serverUrl,
+                path,
                 HttpMethod.PUT,
                 requestEntity,
                 BookingResponse.class);
@@ -69,13 +75,14 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public BookingResponse findBookingById(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
                                     @PathVariable int bookingId) {
-        String serverUrl = String.format("http://localhost:9090/bookings/%d", bookingId);
+//        String serverUrl = String.format("http://localhost:9090/bookings/%d", bookingId);
+        String path = baseUrl.concat(String.format("/bookings/%d", bookingId));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
         HttpEntity<CreateBookingRequest> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<BookingResponse> response = restTemplate.exchange(serverUrl, HttpMethod.GET, entity, BookingResponse.class);
+        ResponseEntity<BookingResponse> response = restTemplate.exchange(path, HttpMethod.GET, entity, BookingResponse.class);
 
         return response.getBody();
     }
@@ -83,9 +90,10 @@ public class BookingController {
     @GetMapping()
     public List<BookingResponse> findUserReservationItems(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
                                                   @RequestParam(defaultValue = "ALL") String state) {
-        String serverUrl = "http://localhost:9090/bookings";
+//        String serverUrl = "http://localhost:9090/bookings";
+        String path = baseUrl.concat("/bookings");
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(path)
                 .queryParam("state", state);
 
         return getBookingResponses(userId, uriBuilder);
@@ -94,9 +102,10 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingResponse> findOwnerReservationItems(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
                                                    @RequestParam(defaultValue = "ALL") String state) {
-        String serverUrl = "http://localhost:9090/bookings";
+//        String serverUrl = "http://localhost:9090/bookings";
+        String path = baseUrl.concat("/bookings");
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(path)
                 .queryParam("state", state)
                 .queryParam("ownerId", userId);
 

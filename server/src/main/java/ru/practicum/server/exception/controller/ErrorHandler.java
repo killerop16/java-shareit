@@ -1,5 +1,6 @@
 package ru.practicum.server.exception.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,8 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.server.exception.modelException.DuplicateEmailException;
 import ru.practicum.server.exception.modelException.NotFoundException;
 import ru.practicum.server.exception.modelException.ValidationException;
-
-import jakarta.persistence.EntityNotFoundException;
 
 
 @Slf4j

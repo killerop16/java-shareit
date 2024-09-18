@@ -1,12 +1,12 @@
 package ru.practicum.server.booking.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.server.exception.modelException.validDate.StartBeforeEndDateValid;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter

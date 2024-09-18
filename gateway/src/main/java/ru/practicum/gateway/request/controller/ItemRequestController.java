@@ -1,5 +1,7 @@
 package ru.practicum.gateway.request.controller;
 
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -19,12 +21,14 @@ import ru.practicum.gateway.request.dto.ItemRequestResponse;
 import ru.practicum.gateway.request.dto.ItemRequestResponseWithItems;
 import ru.practicum.gateway.util.HttpHeadersControllers;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
+    @Value("${shareit.server.url}")
+    private String baseUrl;
+
     private final RestTemplate restTemplate;
 
     public ItemRequestController(RestTemplateBuilder builder) {
@@ -36,24 +40,26 @@ public class ItemRequestController {
     public ItemRequestResponse create(@Valid @RequestBody CreateItemRequest createRequest,
                                       @RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
 
-        String serverUrl = "http://localhost:9090/requests";
+//        String serverUrl = "http://localhost:9090/requests";
+        String path = baseUrl.concat("/requests");
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
 
         HttpEntity<CreateItemRequest> request = new HttpEntity<>(createRequest, headers);
-        ResponseEntity<ItemRequestResponse> response = restTemplate.postForEntity(serverUrl, request, ItemRequestResponse.class);
+        ResponseEntity<ItemRequestResponse> response = restTemplate.postForEntity(path, request, ItemRequestResponse.class);
         return response.getBody();
     }
 
     @GetMapping
     public List<ItemRequestResponseWithItems> foundRequestsById(@RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
-        String serverUrl = "http://localhost:9090/requests";
+//        String serverUrl = "http://localhost:9090/requests";
+        String path = baseUrl.concat("/requests");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<List<ItemRequestResponseWithItems>> response = restTemplate.exchange(serverUrl, HttpMethod.GET, entity,
+        ResponseEntity<List<ItemRequestResponseWithItems>> response = restTemplate.exchange(path, HttpMethod.GET, entity,
                 new ParameterizedTypeReference<>() {});
 
         return response.getBody();
@@ -61,9 +67,10 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestResponse> findAllRequests() {
-        String serverUrl = "http://localhost:9090/requests/all";
+//        String serverUrl = "http://localhost:9090/requests/all";
+        String path = baseUrl.concat("/requests/all");
 
-        ResponseEntity<List<ItemRequestResponse>> response = restTemplate.exchange(serverUrl, HttpMethod.GET,
+        ResponseEntity<List<ItemRequestResponse>> response = restTemplate.exchange(path, HttpMethod.GET,
                 null, new ParameterizedTypeReference<>() {});
         return response.getBody();
     }
@@ -71,13 +78,14 @@ public class ItemRequestController {
     @GetMapping("/{requestId}")
     public ItemRequestResponseWithItems foundById(@PathVariable int requestId,
                                                   @RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
-        String serverUrl = String.format("http://localhost:9090/requests/%d", requestId);
+//        String serverUrl = String.format("http://localhost:9090/requests/%d", requestId);
+        String path = baseUrl.concat("/requests/" + requestId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<ItemRequestResponseWithItems> response = restTemplate.exchange(serverUrl, HttpMethod.GET,
+        ResponseEntity<ItemRequestResponseWithItems> response = restTemplate.exchange(path, HttpMethod.GET,
                 entity, ItemRequestResponseWithItems.class);
 
         return response.getBody();

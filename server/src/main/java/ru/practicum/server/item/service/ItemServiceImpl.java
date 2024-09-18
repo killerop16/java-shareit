@@ -1,5 +1,6 @@
 package ru.practicum.server.item.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -23,7 +24,6 @@ import ru.practicum.server.item.repository.ItemRepository;
 import ru.practicum.server.user.model.User;
 import ru.practicum.server.user.repository.UserRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;

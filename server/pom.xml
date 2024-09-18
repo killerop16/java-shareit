@@ -9,8 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.example</groupId>
-    <artifactId>server</artifactId>
+    <artifactId>shareit-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>ShareIt Server</name>
 
     <dependencies>
         <dependency>

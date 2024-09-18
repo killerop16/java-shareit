@@ -1,5 +1,6 @@
 package ru.practicum.server.booking.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,7 +22,6 @@ import ru.practicum.server.user.model.User;
 import ru.practicum.server.user.repository.UserRepository;
 import ru.practicum.server.user.service.UserService;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

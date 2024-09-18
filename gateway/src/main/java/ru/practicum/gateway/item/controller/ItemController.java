@@ -1,5 +1,7 @@
 package ru.practicum.gateway.item.controller;
 
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -25,12 +27,14 @@ import ru.practicum.gateway.item.dto.ItemResponse;
 import ru.practicum.gateway.item.dto.UpdateItemRequest;
 import ru.practicum.gateway.util.HttpHeadersControllers;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/items")
 public class ItemController {
+    @Value("${shareit.server.url}")
+    private String baseUrl;
+
     private final RestTemplate restTemplate;
 
     public ItemController(RestTemplateBuilder builder) {
@@ -40,33 +44,37 @@ public class ItemController {
     @PostMapping
     public ItemResponse createItem(@Valid @RequestBody CreateItem itemDto,
                                    @RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
-        String serverUrl = "http://localhost:9090/items";
+        String path = baseUrl.concat("/items");
+
+//        String serverUrl = "http://localhost:9090/items";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
 
         HttpEntity<CreateItem> request = new HttpEntity<>(itemDto, headers);
 
-        ResponseEntity<ItemResponse> response = restTemplate.postForEntity(serverUrl, request, ItemResponse.class);
+        ResponseEntity<ItemResponse> response = restTemplate.postForEntity(path, request, ItemResponse.class);
         return response.getBody();
     }
 
     @PatchMapping("/{itemId}")
     public ItemResponse updateItem(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
                                    @PathVariable int itemId, @Valid @RequestBody UpdateItemRequest itemDto) {
-        String serverUrl = String.format("http://localhost:9090/items/%d", itemId);
+//        String serverUrl = String.format("http://localhost:9090/items/%d", itemId);
+        String path = baseUrl.concat(String.format("/items/%d", itemId));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
 
         HttpEntity<UpdateItemRequest> request = new HttpEntity<>(itemDto, headers);
-        ResponseEntity<ItemResponse> response = restTemplate.exchange(serverUrl, HttpMethod.PATCH, request, ItemResponse.class);
+        ResponseEntity<ItemResponse> response = restTemplate.exchange(path, HttpMethod.PATCH, request, ItemResponse.class);
         return response.getBody();
     }
 
     @GetMapping("/{itemId}")
     public ItemResponse findItemById(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
                                      @PathVariable int itemId) {
-        String serverUrl = String.format("http://localhost:9090/items/%d", itemId);
+//        String serverUrl = String.format("http://localhost:9090/items/%d", itemId);
+        String path = baseUrl.concat(String.format("/items/%d", itemId));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
@@ -74,20 +82,21 @@ public class ItemController {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
 
-        ResponseEntity<ItemResponse> response = restTemplate.exchange(serverUrl, HttpMethod.GET, entity, ItemResponse.class);
+        ResponseEntity<ItemResponse> response = restTemplate.exchange(path, HttpMethod.GET, entity, ItemResponse.class);
         return response.getBody();
     }
 
     @GetMapping
     public List<ItemResponse> findUserItemsById(@RequestHeader(HttpHeadersControllers.USER_ID) int userId) {
-        String serverUrl = "http://localhost:9090/items";
+//        String serverUrl = "http://localhost:9090/items";
+        String path = baseUrl.concat("/items");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<List<ItemResponse>> response = restTemplate.exchange(serverUrl, HttpMethod.GET, entity, new ParameterizedTypeReference<>() {
+        ResponseEntity<List<ItemResponse>> response = restTemplate.exchange(path, HttpMethod.GET, entity, new ParameterizedTypeReference<>() {
         });
 
         if (response.getBody() == null || response.getBody().isEmpty()) {
@@ -99,14 +108,15 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemResponse> findItemByText(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
                                              @RequestParam("text") String text) {
-        String serverUrl = String.format("http://localhost:9090/items/search?text=%s", text);
+//        String serverUrl = String.format("http://localhost:9090/items/search?text=%s", text);
+        String path = baseUrl.concat(String.format("/items/search?text=%s", text));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<List<ItemResponse>> response = restTemplate.exchange(serverUrl, HttpMethod.GET, entity,
+        ResponseEntity<List<ItemResponse>> response = restTemplate.exchange(path, HttpMethod.GET, entity,
                 new ParameterizedTypeReference<>() {});
 
         if (response.getBody() == null || response.getBody().isEmpty()) {
@@ -120,14 +130,15 @@ public class ItemController {
     public CommentResponse createComment(@RequestHeader(HttpHeadersControllers.USER_ID) int userId,
                                          @PathVariable int itemId, @RequestBody CreateCommentRequest commentDto) {
 
-        String serverUrl = String.format("http://localhost:9090/items/%d/comment", itemId);
+//        String serverUrl = String.format("http://localhost:9090/items/%d/comment", itemId);
+        String path = baseUrl.concat(String.format("/items/%d/comment", itemId));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeadersControllers.USER_ID, String.valueOf(userId));
 
         HttpEntity<CreateCommentRequest> entity = new HttpEntity<>(commentDto, headers);
 
-        ResponseEntity<CommentResponse> response = restTemplate.exchange(serverUrl, HttpMethod.POST, entity, CommentResponse.class);
+        ResponseEntity<CommentResponse> response = restTemplate.exchange(path, HttpMethod.POST, entity, CommentResponse.class);
 
         if (response.getBody() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Comment could not be created");
