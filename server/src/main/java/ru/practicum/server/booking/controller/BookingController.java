@@ -2,9 +2,9 @@ package ru.practicum.server.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +24,12 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingResponse createBooking(@RequestBody CreateBookingRequest bookingDto,
-                                         @RequestHeader(HttpHeaders.USER_ID) int userId) {
+    public BookingResponse createBooking(@RequestHeader(HttpHeaders.USER_ID) int userId,
+            @RequestBody CreateBookingRequest bookingDto) {
         return bookingService.createBooking(bookingDto, userId);
     }
 
-    @PutMapping("/{bookingId}")
+    @PatchMapping("/{bookingId}")
     public BookingResponse confirmOrRejectBooking(@PathVariable int bookingId,
                                           @RequestParam boolean approved,
                                           @RequestHeader(HttpHeaders.USER_ID) int userId) {
