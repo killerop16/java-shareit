@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,7 +81,7 @@ public class BookingControllerTest {
         when(bookingService.confirmOrRejectBooking(anyInt(), anyBoolean(), anyInt()))
                 .thenReturn(bookingResponse);
 
-        mockMvc.perform(put("/bookings/1")
+        mockMvc.perform(patch("/bookings/1")
                         .param("approved", "true")
                         .header(HttpHeaders.USER_ID, 1))
                 .andExpect(status().isOk())

@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,6 +57,7 @@ public class UserControllerTest {
         userResponse.setEmail("john.doe@example.com");
     }
 
+
     @Test
     public void testCreateUser() throws Exception {
         given(userService.create(any(CreateUserRequest.class)))
@@ -73,17 +74,24 @@ public class UserControllerTest {
 
     @Test
     public void testUpdateUser() throws Exception {
-        given(userService.update(anyInt(), any(UpdateUserRequest.class)))
-                .willReturn(userResponse);
+        // Возвращаем обновлённые данные
+        UserResponse updatedUserResponse = new UserResponse();
+        updatedUserResponse.setId(1);
+        updatedUserResponse.setName("John Updated");
+        updatedUserResponse.setEmail("john.updated@example.com");
 
-        mockMvc.perform(put("/users/1")
+        given(userService.update(anyInt(), any(UpdateUserRequest.class)))
+                .willReturn(updatedUserResponse);  // Возвращаем обновлённого пользователя
+
+        mockMvc.perform(patch("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateUserRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("John Doe"))
-                .andExpect(jsonPath("$.email").value("john.doe@example.com"));
+                .andExpect(jsonPath("$.name").value("John Updated"))  // Ожидаем обновлённое имя
+                .andExpect(jsonPath("$.email").value("john.updated@example.com"));  // Ожидаем обновлённый email
     }
+
 
     @Test
     public void testGetUserById() throws Exception {
